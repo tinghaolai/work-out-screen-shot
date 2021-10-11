@@ -106,9 +106,7 @@
                     }
                 } else {
                     currentWidthRate++;
-                    console.log('vc: ' + img.currentSrc + ' cw rate: ' + currentWidthRate + ' bias: ' + biasRate);
                     if (currentWidthRate > biasRate) {
-                        console.log('max... ');
                         biasRate++;
                         currentWidthRate = biasRate;
                         currentHeightRate = 0;
