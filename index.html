@@ -1,0 +1,133 @@
+<html>
+    <head></head>
+    <style>
+        .oriImg {
+            display: none;
+        }
+
+        canvas {
+            height: 200px;
+        }
+    </style>
+    <body>
+    <div id="app"></div>
+    <script src="plugins/vue.js"></script>
+    <script src="plugins/moment.min.js"></script>
+    <script type="text/javascript">
+        const app = document.getElementById('app');
+        const config = {
+            dateRange: [-7, 0],
+            subImageMax: 10,
+            fileExtension: 'jpg',
+            filenameFormat: 'MMDD',
+            fileFolder: 'imgs',
+        };
+
+        function generateTargetDates(startDays, endDays) {
+            let startDate = moment().add(startDays, 'days');
+            let endDate = moment().add(endDays, 'days');
+            let days = [];
+            while (!startDate.isAfter(endDate)) {
+                days.push(startDate.format(config.filenameFormat));
+                startDate.add(1, 'days');
+            }
+
+            return days;
+        }
+
+        function getSearchImageCount() {
+            return (config.dateRange[1] - config.dateRange[0] + 1) * (config.subImageMax + 1);
+        }
+
+        function createImage(filename, group) {
+            let image = document.createElement('img');
+            image.src = config.fileFolder + '/' + filename + '.' + config.fileExtension;
+            image.classList.add('oriImg');
+            image.onload = () => {
+                imageLoadTried++;
+                if (!imageGroup[group]) {
+                    imageGroup[group] = [];
+                }
+
+                imageGroup[group].push(image);
+                if (imageLoadTried === imageTotal) {
+                    combineImageGroups();
+                }
+            };
+
+            image.onerror = () => {
+                imageLoadTried++;
+                if (imageLoadTried === imageTotal) {
+                    combineImageGroups();
+                }
+            };
+
+            app.appendChild(image);
+        }
+
+        function combineImageGroups() {
+            Object.keys(imageGroup).forEach(day => {
+                let groupContainer = document.createElement('div');
+                let groupTitle = document.createElement('div');
+                groupTitle.innerText = day;
+
+                let canvas = document.createElement('canvas');
+                let images = imageGroup[day];
+                let sqrt = Math.sqrt(images.length);
+                canvas.width = images[0].width * Math.ceil(sqrt);
+                let sqrtFloor = Math.floor(sqrt);
+                if (images.length - Math.pow(sqrtFloor, 2) > sqrtFloor) {
+                    canvas.height = images[0].height * (sqrtFloor + 1);
+                } else {
+                    canvas.height = images[0].height * sqrtFloor;
+                }
+
+                let context = canvas.getContext('2d');
+                drawAlgorithm(images, context);
+                groupContainer.appendChild(groupTitle);
+                groupContainer.appendChild(canvas);
+                app.appendChild(groupContainer);
+            });
+        }
+
+        function drawAlgorithm(images, context) {
+            let biasRate = 0;
+            let currentWidthRate = 0;
+            let currentHeightRate = 0;
+            let currentDirection = 'horizontal';
+
+            images.forEach(img => {
+                context.drawImage(img, img.width * currentWidthRate, img.height * currentHeightRate);
+                if (currentDirection === 'vertical') {
+                    currentHeightRate++;
+                    if (currentHeightRate === biasRate) {
+                        currentWidthRate = 0;
+                        currentDirection = 'horizontal';
+                    }
+                } else {
+                    currentWidthRate++;
+                    console.log('vc: ' + img.currentSrc + ' cw rate: ' + currentWidthRate + ' bias: ' + biasRate);
+                    if (currentWidthRate > biasRate) {
+                        console.log('max... ');
+                        biasRate++;
+                        currentWidthRate = biasRate;
+                        currentHeightRate = 0;
+                        currentDirection = 'vertical';
+                    }
+                }
+            });
+        }
+
+        let imageLoadTried = 0;
+        let imageTotal = getSearchImageCount();
+        let imageGroup = {};
+        let days = generateTargetDates(config.dateRange[0], config.dateRange[1]);
+        days.forEach(day => {
+            createImage(day, day);
+            for (let i = 0; i < config.subImageMax; i++) {
+                createImage(day + '-' + i, day);
+            }
+        });
+    </script>
+    </body>
+</html>
