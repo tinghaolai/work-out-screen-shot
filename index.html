@@ -28,6 +28,11 @@
                 ['#7092BE', '#22B14C'],
                 ['#7F7F7F', '#7092BE'],
             ],
+            takePhoto: {
+                width: 1477,
+                height: 1108,
+            },
+            weekBias: 35,
         };
 
         function generateTargetDates(startDays, endDays) {
@@ -43,7 +48,7 @@
         }
 
         function getSearchImageCount() {
-            return (config.dateRange[1] - config.dateRange[0] + 1) * (config.subImageMax + 1);
+            return (config.dateRange[1] - config.dateRange[0] + 2) * (config.subImageMax + 1);
         }
 
         function createImage(filename, group) {
@@ -73,6 +78,7 @@
         }
 
         function handleImageGroups() {
+            console.log(imageGroup);
             Object.keys(imageGroup).forEach(day => {
                 let groupContainer = document.createElement('div');
                 let groupTitle = document.createElement('div');
@@ -82,7 +88,15 @@
                 let images = imageGroup[day];
                 let sqrt = Math.sqrt(images.length);
                 let widthRate = Math.ceil(sqrt);
-                canvas.width = images[0].width * widthRate;
+                if (day === 'week') {
+                    canvas.width = 0;
+                    images.forEach(img => {
+                        canvas.width += img.width;
+                    });
+                } else {
+                    canvas.width = images[0].width * widthRate;
+                }
+
                 let sqrtFloor = Math.floor(sqrt);
                 if (images.length - Math.pow(sqrtFloor, 2) > sqrtFloor) {
                     canvas.height = images[0].height * (sqrtFloor + 1);
@@ -92,15 +106,33 @@
 
                 let context = canvas.getContext('2d');
                 imageCombineAlgorithm(images, context);
-                const waterMarkInfo = parseDayWaterMarkInfo(day);
-                addingWaterMark(
-                    context,
-                    waterMarkInfo.waterMarkText,
-                    waterMarkInfo.waterMarkColor,
-                    canvas.width,
-                    canvas.height,
-                    widthRate
-                );
+                let waterMarkInfo;
+                if (day === 'week') {
+                    console.log(moment().week());
+                    let week = (moment().week() - config.weekBias);
+                    if (week < 10) {
+                        week = '0' + week;
+                    }
+
+                    addingWaterMark(
+                        context,
+                        'Week ' + week,
+                        '#D20015',
+                        canvas.width,
+                        canvas.height,
+                        widthRate
+                    );
+                } else {
+                    const waterMarkInfo = parseDayWaterMarkInfo(day);
+                    addingWaterMark(
+                        context,
+                        waterMarkInfo.waterMarkText,
+                        waterMarkInfo.waterMarkColor,
+                        canvas.width,
+                        canvas.height,
+                        widthRate
+                    );
+                }
 
                 groupContainer.appendChild(groupTitle);
                 groupContainer.appendChild(canvas);
@@ -109,7 +141,6 @@
         }
 
         function addingWaterMark(context, text, color, width, height, widthRate) {
-            console.log('addingWaterMark');
             context.beginPath();
             context.fillStyle  = "white";
             context.fillRect(width * 0.1, height * 0.4, width * 0.8, height * 0.15);
@@ -161,9 +192,14 @@
             let currentWidthRate = 0;
             let currentHeightRate = 0;
             let currentDirection = 'horizontal';
+            let lastImgWidth = 0;
+            let lastImgHeight = 0;
 
             images.forEach(img => {
-                context.drawImage(img, img.width * currentWidthRate, img.height * currentHeightRate);
+
+                context.drawImage(img, lastImgWidth * currentWidthRate, lastImgHeight * currentHeightRate);
+                lastImgWidth = img.width;
+                lastImgHeight = img.height;
                 if (currentDirection === 'vertical') {
                     currentHeightRate++;
                     if (currentHeightRate === biasRate) {
@@ -192,6 +228,11 @@
                 createImage(day + '-' + i, day);
             }
         });
+
+        createImage('week', 'week');
+        for (let i = 0; i < config.subImageMax; i++) {
+            createImage('week-' + i, 'week');
+        }
     </script>
     </body>
 </html>
