@@ -21,6 +21,13 @@
             fileExtension: 'jpg',
             filenameFormat: 'MMDD',
             fileFolder: 'imgs',
+            weekSplit: [[0, 1, 2, 3], [4, 5, 6]],
+            waterMarkColor: [
+                ['#A349A4', '#FF7F27'],
+                ['#3F48CC', '#880015'],
+                ['#7092BE', '#22B14C'],
+                ['#7F7F7F', '#7092BE'],
+            ],
         };
 
         function generateTargetDates(startDays, endDays) {
@@ -84,10 +91,48 @@
 
                 let context = canvas.getContext('2d');
                 drawAlgorithm(images, context);
+                const waterMarkInfo = parseDayWaterMarkInfo(day);
                 groupContainer.appendChild(groupTitle);
                 groupContainer.appendChild(canvas);
                 app.appendChild(groupContainer);
             });
+        }
+
+        function parseDayWaterMarkInfo(day) {
+            let date = moment(day, config.filenameFormat);
+            let dateText;
+            switch (date.day()) {
+                case 1:
+                    dateText = '一';
+                    break;
+                case 2:
+                    dateText = '二';
+                    break;
+                case 3:
+                    dateText = '三';
+                    break;
+                case 4:
+                    dateText = '四';
+                    break;
+                case 5:
+                    dateText = '五';
+                    break;
+                case 6:
+                    dateText = '六';
+                    break;
+                default:
+                    dateText = '日';
+                    break;
+            }
+
+            let dateSplitGroup = config.weekSplit.findIndex(group => {
+                return group.includes(date.day());
+            });
+
+            return {
+                waterMarkText: date.format('YYYY/MM/DD') + '(' + dateText + ')',
+                waterMarkColor: config.waterMarkColor[date.week() % 4][dateSplitGroup],
+            }
         }
 
         function drawAlgorithm(images, context) {
