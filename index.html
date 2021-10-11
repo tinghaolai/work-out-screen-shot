@@ -58,21 +58,21 @@
 
                 imageGroup[group].push(image);
                 if (imageLoadTried === imageTotal) {
-                    combineImageGroups();
+                    handleImageGroups();
                 }
             };
 
             image.onerror = () => {
                 imageLoadTried++;
                 if (imageLoadTried === imageTotal) {
-                    combineImageGroups();
+                    handleImageGroups();
                 }
             };
 
             app.appendChild(image);
         }
 
-        function combineImageGroups() {
+        function handleImageGroups() {
             Object.keys(imageGroup).forEach(day => {
                 let groupContainer = document.createElement('div');
                 let groupTitle = document.createElement('div');
@@ -90,7 +90,7 @@
                 }
 
                 let context = canvas.getContext('2d');
-                drawAlgorithm(images, context);
+                imageCombineAlgorithm(images, context);
                 const waterMarkInfo = parseDayWaterMarkInfo(day);
                 groupContainer.appendChild(groupTitle);
                 groupContainer.appendChild(canvas);
@@ -135,7 +135,7 @@
             }
         }
 
-        function drawAlgorithm(images, context) {
+        function imageCombineAlgorithm(images, context) {
             let biasRate = 0;
             let currentWidthRate = 0;
             let currentHeightRate = 0;
