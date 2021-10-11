@@ -78,7 +78,6 @@
         }
 
         function handleImageGroups() {
-            console.log(imageGroup);
             Object.keys(imageGroup).forEach(day => {
                 let groupContainer = document.createElement('div');
                 let groupTitle = document.createElement('div');
@@ -106,9 +105,7 @@
 
                 let context = canvas.getContext('2d');
                 imageCombineAlgorithm(images, context);
-                let waterMarkInfo;
                 if (day === 'week') {
-                    console.log(moment().week());
                     let week = (moment().week() - config.weekBias);
                     if (week < 10) {
                         week = '0' + week;
