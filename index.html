@@ -77,11 +77,21 @@
             app.appendChild(image);
         }
 
+        function copyText(text) {
+            let textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("Copy");
+            textArea.remove();
+        }
+
         function handleImageGroups() {
             Object.keys(imageGroup).forEach(day => {
                 let groupContainer = document.createElement('div');
                 let groupTitle = document.createElement('div');
-                groupTitle.innerText = day;
+                groupTitle.innerText = day + '.' + config.fileExtension;
+                groupTitle.onclick = () => { copyText(day + '.' + config.fileExtension); }
 
                 let canvas = document.createElement('canvas');
                 let images = imageGroup[day];
