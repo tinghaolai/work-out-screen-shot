@@ -90,11 +90,13 @@
             Object.keys(imageGroup).forEach(day => {
                 let groupContainer = document.createElement('div');
                 let groupTitle = document.createElement('div');
-                groupTitle.innerText = day + '.' + config.fileExtension;
-                groupTitle.onclick = () => { copyText(day + '.' + config.fileExtension); };
+                let downloadName = day + '.' + config.fileExtension;
+                allDownFileName.push(downloadName);
+                groupTitle.innerText = downloadName;
+                groupTitle.onclick = () => { copyText(downloadName); };
 
                 let canvas = document.createElement('canvas');
-                canvas.onclick = () => { copyText(day + '.' + config.fileExtension); };
+                canvas.onclick = () => { copyText(downloadName); };
                 let images = imageGroup[day];
                 let sqrt = Math.sqrt(images.length);
                 let widthRate = Math.ceil(sqrt);
@@ -147,6 +149,17 @@
                 groupContainer.appendChild(canvas);
                 app.appendChild(groupContainer);
             });
+
+            let allFileText = document.createElement('div');
+            allFileText.innerText = 'Line album upload ordering';
+
+            let allFile = document.createElement('div');
+            let uploadText = '"' + allDownFileName.join('" "') + '"';
+            allFile.innerText = uploadText;
+            allFile.onclick = () => { copyText(uploadText); };
+
+            app.appendChild(allFileText);
+            app.appendChild(allFile);
         }
 
         function addingWaterMark(context, text, color, width, height, widthRate, ifWeek = false) {
@@ -239,6 +252,7 @@
         let imageLoadTried = 0;
         let imageTotal = getSearchImageCount();
         let imageGroup = {};
+        let allDownFileName = [];
         let days = generateTargetDates(config.dateRange[0], config.dateRange[1]);
         days.forEach(day => {
             createImage(day, day);
