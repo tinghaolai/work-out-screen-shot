@@ -91,9 +91,10 @@
                 let groupContainer = document.createElement('div');
                 let groupTitle = document.createElement('div');
                 groupTitle.innerText = day + '.' + config.fileExtension;
-                groupTitle.onclick = () => { copyText(day + '.' + config.fileExtension); }
+                groupTitle.onclick = () => { copyText(day + '.' + config.fileExtension); };
 
                 let canvas = document.createElement('canvas');
+                canvas.onclick = () => { copyText(day + '.' + config.fileExtension); };
                 let images = imageGroup[day];
                 let sqrt = Math.sqrt(images.length);
                 let widthRate = Math.ceil(sqrt);
