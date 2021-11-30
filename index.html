@@ -37,6 +37,8 @@
                 height: 1108,
             },
             weekBias: 35,
+            waterMarkBackgroundHeightBias: 0.4,
+            waterMarkTextHeightBias: 0.5,
         };
 
         function generateTargetDates(startDays, endDays) {
@@ -176,7 +178,7 @@
             if (ifWeek) {
                 context.fillRect(width * 0.3, height * 0.4, width * 0.4, height * 0.15);
             } else {
-                context.fillRect(width * 0.1, height * 0.4, width * 0.8, height * 0.15);
+                context.fillRect(width * 0.1, height * config.waterMarkBackgroundHeightBias, width * 0.8, height * 0.15);
             }
 
             let fonSize = 110;
@@ -185,7 +187,7 @@
             if (ifWeek) {
                 context.fillText(text, width * 0.325, height * 0.5);
             } else {
-                context.fillText(text, width * 0.15, height * 0.5);
+                context.fillText(text, width * 0.15, height * config.waterMarkTextHeightBias);
             }
         }
 
@@ -259,6 +261,14 @@
 
         new Vue({
             el: '#vue',
+            data() {
+                return {
+                    config: {
+                        waterMarkBackgroundHeightBias: config.waterMarkBackgroundHeightBias,
+                        waterMarkTextHeightBias: config.waterMarkTextHeightBias,
+                    },
+                };
+            },
             mounted() {
                 this.generateImage();
             },
