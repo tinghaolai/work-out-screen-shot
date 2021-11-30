@@ -10,10 +10,14 @@
         }
     </style>
     <body>
+    <div id="vue">
+        <button >Regenerate</button>
+    </div>
     <div id="app"></div>
     <script src="plugins/vue.js"></script>
     <script src="plugins/moment.min.js"></script>
     <script type="text/javascript">
+        let imageLoadTried, imageTotal, imageGroup, allDownFileName, days;
         const app = document.getElementById('app');
         const config = {
             dateRange: [-7, 0],
@@ -253,22 +257,32 @@
             });
         }
 
-        let imageLoadTried = 0;
-        let imageTotal = getSearchImageCount();
-        let imageGroup = {};
-        let allDownFileName = [];
-        let days = generateTargetDates(config.dateRange[0], config.dateRange[1]);
-        days.forEach(day => {
-            createImage(day, day);
-            for (let i = 0; i < config.subImageMax; i++) {
-                createImage(day + '-' + i, day);
+        new Vue({
+            el: '#vue',
+            mounted() {
+                this.generateImage();
+            },
+            methods: {
+                generateImage() {
+                    imageLoadTried = 0;
+                    imageTotal = getSearchImageCount();
+                    imageGroup = {};
+                    allDownFileName = [];
+                    days = generateTargetDates(config.dateRange[0], config.dateRange[1]);
+                    days.forEach(day => {
+                        createImage(day, day);
+                        for (let i = 0; i < config.subImageMax; i++) {
+                            createImage(day + '-' + i, day);
+                        }
+                    });
+
+                    createImage('week', 'week');
+                    for (let i = 0; i < config.subImageMax; i++) {
+                        createImage('week-' + i, 'week');
+                    }
+                },
             }
         });
-
-        createImage('week', 'week');
-        for (let i = 0; i < config.subImageMax; i++) {
-            createImage('week-' + i, 'week');
-        }
     </script>
     </body>
 </html>
